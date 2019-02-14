@@ -1,0 +1,36 @@
+sudo: required
+services:
+- docker
+language: python
+python:
+- '3.5'
+before_install:
+- docker version
+- docker info
+install:
+- npm install newman
+- pip install -r requirements.txt
+- pip install nose
+- pip install Flask-Testing
+before_script:
+- node --version
+- npm --version
+- node_modules/.bin/newman --version
+script:
+- nosetests
+- docker build -t besteinert/devops:swagger_server .
+- docker run --name bennys_api -d -t -p 127.0.0.1:8080:8080 besteinert/devops:swagger_server
+- docker ps
+- count=0 && until $(curl --output /dev/null --silent --head --fail http://localhost:8080);
+  do printf '.' && sleep 3 && count=$((count+1)) && if [ $count -gt 5 ]; then break;
+  fi; done
+#- node_modules/.bin/newman run tests/postman_collection.json -e tests/postman_environment.json
+
+after_success:
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- docker tag swagger_server besteinert/devops:swagger_server
+- docker push besteinert/devops:swagger_server
+env:
+  global:
+  - secure: ZE9ZEIWpdBinhg+yNCLnE04+6fZ1TxjHovDqjrTKNRlOvr0FSMfS5MKvgOZVlXHe+5wx8bm0HmKYMn0M+rERDS0ENR9ptyrxPHJduyz8p8+2lGEr8cY2f+DIGk5qsLKnAjRM1pQc+VKKqzhMMoUck17pdYBZDF9547UIQ7z5YzmsaaQ3GHDSMS7y7DisfaTQfpwYoNxiA8gG1h69sfCwfWoqlMrcek+V6yFek0tYknAvmh/pxZcvoRukpR7QePlUL69/cWPWqMAVFmMR5NaAAsDVx9dGiHkDFRmfZgoT21SWlhpoUNJnIfTy55As32Dd3iS3eEJXzdHfIe00/4uiLW+Xebol+wrg1ZvJDIQibRhyNgBckFuzqOnrVonkQywDaCdunzuABihqX7AjVxOVuINvhqFnD9oe3xm3Yo+1DQGtXwQ5T+O5LoyyiqUzTmNTceCc6PlMclBuMjvPkLrVpNdwgWVDlRNSrUgI1Pp6etBn0vRvFqyPQ97KaKiQ/KoqEslExdwO9fIzKm9COnDnsMI2B9NFwA7sOCnrcIvtwT7gh6BwMSMajxrsJgO+RdMITF98rf76X+jWorL2/46geBMh86ByKnT9yV/V6eywSG2UAbw0wTy/4WSpe4DQ2tVS1FWy9snlG2DRhrUx3kERROSiaoQGqiu67dRF4BElu20=
+  - secure: OV+aZxdlR9F0yFFADCyDWRh34THRSuT9E3RSuvxpN2Ec4WLlCvQLCZw4JN73K/tm8cl/6OHHiJdIUt4E+YTF5hXLzqfcxwbQHaM4ildhWnAozl36+ZR1nq890Evq+/8WlsMo4swWPMHcguuKLXhjV8FS9/RWTn2Nae/S24iBOvCjjlCeeyPanwsk7CVrTYcYz/6VLEyO9JLgSStxMSqzx91dZ2bFAgDBPSYebWzeAUOxKBQP8uga3aVFAzpxY3tPz04be6IJ+uglzW5JgEQWPk8C63TXnjqckuat5P5ibyJ2Yj8lFUpcoCE5GpSDv1Mf9TZXSU2XiQA/pK+0VLxy0/JQnrZrRMR2E/BpQ9/5bHSdTFeDjl1Kmqwhihy5RFc5922WDEX8EyldSD0SxiH1ZBtbI13htrkOC1ElL1uzl+a+w00hWImxnL8gnWAjjeKvbsOYaez75b5D1M6cgfN2lGMDvVPIGnenuvCW524a6NpAbqIy6C9Z2I01KDoTrYb+vMn9gP/QLCGN29iWjDSlT8SO8Kc9/HS6SOK9UWwiumyIv5UuORSTkOA8fskfgGvw99Ea+KEsOohnk9mda9mYhmVFPQhWnSeGbZaIUEi64tti7FXnefQmlUQZyDm6fmrAW7f84+lkkw0cXwd9dpWjI6WuhGk6zMPKADmVo2nyER4=
