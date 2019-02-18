@@ -29,7 +29,7 @@
                                     "if (responseCode.code === 204) {",
                                     "    var numOfposts = _.parseInt(environment.numOfposts);",
                                     "    //If count is less than 5 set next to this",
-                                    "    if(count<numOfposts-1){",
+                                    "    if(count<5){",
                                     "        postman.setNextRequest(\"Creates a person\");",
                                     "    }else{",
                                     "        postman.setNextRequest(\"Gets some persons\");",
