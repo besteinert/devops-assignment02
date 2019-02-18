@@ -25,7 +25,6 @@
                                     "//Test if created ",
                                     "tests[\"Status code is 204\"] = (responseCode.code === 204);",
                                     "//Get the POST count ",
-                                    "postman.setEnvironmentVariable(\"count\", 0);",
                                     "var count = _.parseInt(environment.count);",
                                     "if (responseCode.code === 204) {",
                                     "    var numOfposts = _.parseInt(environment.numOfposts);",
