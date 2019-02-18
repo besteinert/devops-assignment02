@@ -58,7 +58,7 @@ def persons_username_delete(username):  # noqa: E501
             persons_list.remove(person)
             return Response(mimetype='application/json', status=204)
 
-    return 'person not found!'
+    return Response('person not found!', mimetype='text/plain', status=404)
 
 
 def persons_username_get(username):  # noqa: E501
