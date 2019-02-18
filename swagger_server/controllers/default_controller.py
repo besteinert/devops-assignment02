@@ -61,6 +61,7 @@ def persons_username_delete(username):  # noqa: E501
     return Response('person not found!', mimetype='text/plain', status=404)
 
 
+
 def persons_username_get(username):  # noqa: E501
     """Gets a specific person
 
