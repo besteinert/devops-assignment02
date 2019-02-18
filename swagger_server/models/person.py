@@ -16,7 +16,7 @@ class Person(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, first_name: str=None, last_name: str=None, username: str=None, date_of_birth: date=None, last_time_online: datetime=None):  # noqa: E501
+    def __init__(self, first_name: str=None, last_name: str=None, username: str=username, date_of_birth: date=None, last_time_online: datetime=None):  # noqa: E501
         """Person - a model defined in Swagger
 
         :param first_name: The first_name of this Person.  # noqa: E501
