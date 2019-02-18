@@ -33,7 +33,8 @@ class TestDefaultController(BaseTestCase):
 
         Creates a person.
         """
-        person = Person(username='username_example')
+        person = Person()
+        person.username="username_example"
         response = self.client.open(
             '/persons',
             method='POST',
