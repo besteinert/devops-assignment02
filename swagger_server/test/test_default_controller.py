@@ -39,7 +39,7 @@ class TestDefaultController(BaseTestCase):
             method='POST',
             data=json.dumps(person),
             content_type='application/json')
-        self.assert200(response,
+        self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_persons_username_delete(self):
@@ -50,7 +50,7 @@ class TestDefaultController(BaseTestCase):
         response = self.client.open(
             '/persons/{username}'.format(username='username_example'),
             method='DELETE')
-        self.assert200(response,
+        self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_persons_username_get(self):
