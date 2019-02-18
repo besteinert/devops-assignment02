@@ -1,33 +1,37 @@
-sudo: required
+sudo: required 
 services:
-- docker
+  - docker
+# ref: https://docs.travis-ci.com/user/languages/python
 language: python
 python:
-- '3.5'
+  - "3.5"
 before_install:
-- docker version
-- docker info
+  - docker version
+  - docker info
 install:
-- npm install newman
-- pip install -r requirements.txt
-- pip install nose
-- pip install Flask-Testing
+  - npm install newman
+  - "pip install -r requirements.txt"
+  - pip install nose
+  - pip install Flask-Testing
 before_script:
-- node --version
-- npm --version
-- node_modules/.bin/newman --version
+  - node --version
+  - npm --version
+  - node_modules/.bin/newman --version  
+  
 script:
-- docker build -t besteinert/devops:swagger_server .
-- docker run --name bennys_api -d -t -p 127.0.0.1:8080:8080 besteinert/devops:swagger_server
-- docker ps
-- count=0 && until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:8080);
-  do printf '.' && sleep 3 && count=$((count+1)) && if [ $count -gt 5 ]; then break;
-  fi; done
+  - nosetests
+  - docker build -t besteinert/devops/swagger_server .
+  - docker run --name bennys_api -d -t -p 127.0.0.1:8080:8080 besteinert/devops/swagger_server
+  - docker ps
+  - count=0 && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.' && sleep 3 && count=$((count+1)) && if [ $count -gt 5 ]; then break; fi; done
+  - node_modules/.bin/newman run tests/postman_collection.json -e tests/postman_environment.json
+  
 after_success:
-- docker login -u $DOCKER_USER -p $DOCKER_PASS
-- docker tag swagger_server besteinert/devops:swagger_server
-- docker push besteinert/devops:swagger_server
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - docker tag besteinert/devops/swagger_server besteinert/devops/swagger_server
+  - docker push besteinert/devops/swagger_server
 env:
   global:
-  - secure: YcFuDmbfW3jnv+6YxCIR78rfKpmw6CFuFD1Gchay2ZazY2H/P2geicp8S8SxMu5U79Zp/GOgraFp3ULw1D2tEAYwW3TinXh4TninFwLHACDw4Xd74+7Jau6T9WmXI1S70tNp5giIX8+Lpo/KTjPNFqjg9abmvZBsRvsHNgHc4p3wz7fcNf8BkL2QS8f9P9EM1M/dO6OKmOAMoY8vRAJggfxOOSl/LLbzYUEx7WBB3b0miBJ1S5nP1C+Fz6OgppaX54L4KcWXVO7AS5CujAs2gvWo1lJoVsXyRTDNI8ZAQ7RQ0gFLPBdRHPJ9nVGPyOOtw1EO2Zyd4WjPidgc/+XFvu227jz+oPMQUO3oB7DTh+gwGzMCfaHQr5QU1CQVwieweYB3RRWJXfAE4a4L796axtZ1/N7eJNMtC0PuMWZ7jYfcii/cfQaFxDnbyIYOftyIDQWq+OQjoonaV+ZttLbt0UNXSVu4bd0IWNCjaUWAGJgK0z97QRkOxe0PuGbr3dpSJLO1Guf/IaYz67+pEHKp09jsdfwFstgnTnUpHfRi/aTEvZNszAXXGioiCgTyCifM/hnV6vsbbxI5wDZlauBKOqPSqH29gYbQd6uE1tRCRtO/21+E4O9QlnkTMQ9XPQq8QgkI/wrqUTGOvzukmk3l0q7jWWU4xdf0uKGXsGgKLHU=
-  - secure: W7hvMOrDthcC0m6etUxPfloXyf/MvHKKrmQlhaHtAbm+iYy4BS/SuOSTH3uL6UTNUbJd6mhQuwzwPES5wezrr5mnATiwAR4VibBRED6+RGYnJ1ffBmlwPgVCAIz/4k9s6QwZumcFLq49cRtSoVSw9GzcoP56UNLuLtVAw8ahqJFU1uWsAhxagGv71zOi30yYsd3Oa8w9H6qxOe90tuUt+57IRQfLfqJIOUKR/fQxOw1mr12jFIf6htHHwDNJUnrxjb43Uw7BLLbwBV4UL0MJrhofhTPMIPgZ4PYvI0Bhicib5mB/p6gT2K7pWZch7sUH7WJEuovUEWYTWYOU1hhrs6ER2Q3QDxdd4U6CpY7M2Muy1u+XOLnaVIbdocfcwN0F/5rVgVUGt0InGf7QZPvED08NIDJwinrzofiATzUkcD2vF3YP50ZWNs6SiFyceW5v9LL6PhorJ0jDqB9JHORm6l+cKvjiARREk2joGm6ph58pNvtXTcM4Txpqy8Gab8UcBSYsc8D1WgVu2v5ZerOHXIz+uw4Os/5B1cEQmtYi180Slb4YBsDCNzOp4/NuSZQzyZwC1owZ9m/M/bqJNodt/b3mbEG3qKKFOXdkiK+KdzKu9+k0mYI/czblY1Bj8XR+dWFNRHh558KkBAzdnhZE2AbgkEBFtm31wcOtBc/E5eY=
+    - secure: YcFuDmbfW3jnv+6YxCIR78rfKpmw6CFuFD1Gchay2ZazY2H/P2geicp8S8SxMu5U79Zp/GOgraFp3ULw1D2tEAYwW3TinXh4TninFwLHACDw4Xd74+7Jau6T9WmXI1S70tNp5giIX8+Lpo/KTjPNFqjg9abmvZBsRvsHNgHc4p3wz7fcNf8BkL2QS8f9P9EM1M/dO6OKmOAMoY8vRAJggfxOOSl/LLbzYUEx7WBB3b0miBJ1S5nP1C+Fz6OgppaX54L4KcWXVO7AS5CujAs2gvWo1lJoVsXyRTDNI8ZAQ7RQ0gFLPBdRHPJ9nVGPyOOtw1EO2Zyd4WjPidgc/+XFvu227jz+oPMQUO3oB7DTh+gwGzMCfaHQr5QU1CQVwieweYB3RRWJXfAE4a4L796axtZ1/N7eJNMtC0PuMWZ7jYfcii/cfQaFxDnbyIYOftyIDQWq+OQjoonaV+ZttLbt0UNXSVu4bd0IWNCjaUWAGJgK0z97QRkOxe0PuGbr3dpSJLO1Guf/IaYz67+pEHKp09jsdfwFstgnTnUpHfRi/aTEvZNszAXXGioiCgTyCifM/hnV6vsbbxI5wDZlauBKOqPSqH29gYbQd6uE1tRCRtO/21+E4O9QlnkTMQ9XPQq8QgkI/wrqUTGOvzukmk3l0q7jWWU4xdf0uKGXsGgKLHU=
+    - secure: W7hvMOrDthcC0m6etUxPfloXyf/MvHKKrmQlhaHtAbm+iYy4BS/SuOSTH3uL6UTNUbJd6mhQuwzwPES5wezrr5mnATiwAR4VibBRED6+RGYnJ1ffBmlwPgVCAIz/4k9s6QwZumcFLq49cRtSoVSw9GzcoP56UNLuLtVAw8ahqJFU1uWsAhxagGv71zOi30yYsd3Oa8w9H6qxOe90tuUt+57IRQfLfqJIOUKR/fQxOw1mr12jFIf6htHHwDNJUnrxjb43Uw7BLLbwBV4UL0MJrhofhTPMIPgZ4PYvI0Bhicib5mB/p6gT2K7pWZch7sUH7WJEuovUEWYTWYOU1hhrs6ER2Q3QDxdd4U6CpY7M2Muy1u+XOLnaVIbdocfcwN0F/5rVgVUGt0InGf7QZPvED08NIDJwinrzofiATzUkcD2vF3YP50ZWNs6SiFyceW5v9LL6PhorJ0jDqB9JHORm6l+cKvjiARREk2joGm6ph58pNvtXTcM4Txpqy8Gab8UcBSYsc8D1WgVu2v5ZerOHXIz+uw4Os/5B1cEQmtYi180Slb4YBsDCNzOp4/NuSZQzyZwC1owZ9m/M/bqJNodt/b3mbEG3qKKFOXdkiK+KdzKu9+k0mYI/czblY1Bj8XR+dWFNRHh558KkBAzdnhZE2AbgkEBFtm31wcOtBc/E5eY=
+

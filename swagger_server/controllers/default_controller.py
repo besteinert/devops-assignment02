@@ -5,7 +5,10 @@ from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.person import Person  # noqa: E501
 from swagger_server.models.persons import Persons  # noqa: E501
 from swagger_server import util
+from flask import request, abort, Response, jsonify
+import json
 
+persons_list = []
 
 def persons_get(pageSize=None, pageNumber=None):  # noqa: E501
     """Gets some persons
@@ -19,7 +22,8 @@ def persons_get(pageSize=None, pageNumber=None):  # noqa: E501
 
     :rtype: Persons
     """
-    return 'do some magic!'
+    return jsonify(items=persons_list)	
+    #return 'do some magic!'
 
 
 def persons_post(person=None):  # noqa: E501
@@ -34,7 +38,9 @@ def persons_post(person=None):  # noqa: E501
     """
     if connexion.request.is_json:
         person = Person.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    persons_list.append(person)
+    return Response(mimetype='application/json', status=204)
+    #return 'do some magic!'
 
 
 def persons_username_delete(username):  # noqa: E501
@@ -47,7 +53,12 @@ def persons_username_delete(username):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    for person in persons_list:
+        if(person.username == username):
+            persons_list.remove(person)
+            return Response(mimetype='application/json', status=204)
+
+    return 'person not found!'
 
 
 def persons_username_get(username):  # noqa: E501
@@ -60,4 +71,9 @@ def persons_username_get(username):  # noqa: E501
 
     :rtype: Person
     """
-    return 'do some magic!'
+    for person in persons_list:
+        if(person.username == username):
+            return person;
+   
+    #print(person.username)
+    return 'person not found!'
